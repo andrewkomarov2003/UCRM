@@ -7,6 +7,7 @@ use App\Http\Resources\TasksResource;
 use App\Models\Tasks;
 use App\Http\Requests\StoreTasksRequest;
 use App\Http\Requests\UpdateTasksRequest;
+use Illuminate\Http\Client\Request;
 
 
 class TasksController extends Controller
@@ -36,8 +37,8 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-
-        return TasksResource::make(Tasks::find($id));
+        $task = Tasks::find($id);
+        return TasksResource::make($task);
     }
 
 
@@ -45,8 +46,9 @@ class TasksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTasksRequest $request, Tasks $tasks)
+    public function update(UpdateTasksRequest $request, $id)
     {
+        $tasks = Tasks::find($id);
         $tasks->update($request->validated());
 
         return TasksResource::make($tasks);
@@ -55,8 +57,20 @@ class TasksController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tasks $tasks)
+    public function destroy($id)
     {
-        //
+        $tasks = Tasks::find($id);
+        $tasks->delete();
+        $tasks->refresh();
+        return response()->noContent();
+    }
+
+
+    public function complete(\Illuminate\Http\Request $request, $id)
+    {
+        $tasks = Tasks::find($id);
+        $tasks->is_complited = $request->is_complited;
+        $tasks->save();
+        return TasksResource::make($tasks);
     }
 }

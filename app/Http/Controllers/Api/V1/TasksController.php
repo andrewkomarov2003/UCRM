@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TasksResource;
 use App\Models\Tasks;
 use App\Http\Requests\StoreTasksRequest;
 use App\Http\Requests\UpdateTasksRequest;
+
 
 class TasksController extends Controller
 {
@@ -14,47 +16,40 @@ class TasksController extends Controller
      */
     public function index()
     {
-        return Tasks::all();
+        return TasksResource::collection(Tasks::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTasksRequest $request)
     {
-        //
+        $tasks = Tasks::create($request->validated());
+
+        return TasksResource::make($tasks);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Tasks $tasks)
+    public function show($id)
     {
-        //
+
+        return TasksResource::make(Tasks::find($id));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Tasks $tasks)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateTasksRequest $request, Tasks $tasks)
     {
-        //
+        $tasks->update($request->validated());
+
+        return TasksResource::make($tasks);
     }
 
     /**
